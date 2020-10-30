@@ -4,6 +4,7 @@
 
 
 Ezframework는 Bukkit에서 사용할 수 있는 IOC 기반 커맨드 프레임워크입니다.
+# [KingCjy](https://github.com/KingCjy/ezframework)
 
 
 ## 사용 방법
@@ -21,7 +22,7 @@ Ezframework는 Bukkit에서 사용할 수 있는 IOC 기반 커맨드 프레임�
 <dependency>
     <groupId>com.github.bagble.ezframework</groupId>
     <artifactId>ezframework-core</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -35,7 +36,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.github.bagble.ezframework:ezframework-core:1.1.1'
+    implementation 'com.github.bagble.ezframework:ezframework-core:1.2.1-SNAPSHOT'
 }
 
 compileJava.options.compilerArgs = ['-parameters']
