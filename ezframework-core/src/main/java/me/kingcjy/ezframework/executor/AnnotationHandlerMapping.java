@@ -24,6 +24,7 @@ public class AnnotationHandlerMapping implements HandlerMapping, BeanFactoryAwar
     private BeanFactory beanFactory;
     private Map<HandlerKey, InvocableHandlerMethod> handlers = new HashMap<>();
     private Map<String, InvocableHandlerMethod> notfoundHandlers = new HashMap<>();
+    private Map<String, InvocableHandlerMethod> tabcompleteHandlers = new HashMap<>();
 
     private DefaultHandlerMethodFactory handlerMethodFactory;
 
@@ -42,10 +43,12 @@ public class AnnotationHandlerMapping implements HandlerMapping, BeanFactoryAwar
     @Override
     public void initialize() {
         Map<Class<?>, Object> controllers = findAnnotatedClasses(EzCommand.class);
+        Set<Method> commandTabCompleteMethods = findAllAnnotatedMethods(controllers.keySet(), TabComplete.class);
         Set<Method> commandMethods = findAllAnnotatedMethods(controllers.keySet(), Command.class);
         Set<Method> notFoundMethods = findAllAnnotatedMethods(controllers.keySet(), NotFound.class);
 
         putMethodsToHandler(controllers, commandMethods);
+        putTabCompleteMethodsToHandler(controllers, commandTabCompleteMethods);
         putNotFountMethodsToHandler(controllers, notFoundMethods);
         generateHelpCommands();
     }
@@ -95,6 +98,16 @@ public class AnnotationHandlerMapping implements HandlerMapping, BeanFactoryAwar
             InvocableHandlerMethod handlerMethod = handlerMethodFactory.createInvocableHandlerMethod(controllers.get(method.getDeclaringClass()), method);
             notfoundHandlers.put(key, handlerMethod);
             logger.log(Level.INFO, "[EzFramework] register not found method : /{0}, method: {1}", new Object[]{key, method});
+        }
+    }
+    
+    private void putTabCompleteMethodsToHandler(Map<Class<?>, Object> controllers, Set<Method> commandTabCompleteMethods) {
+        for (Method method : commandTabCompleteMethods) {
+            String key = method.getDeclaringClass().getAnnotation(EzCommand.class).value();
+
+            InvocableHandlerMethod handlerMethod = handlerMethodFactory.createInvocableHandlerMethod(controllers.get(method.getDeclaringClass()), method);
+            tabcompleteHandlers.put(key, handlerMethod);
+            logger.log(Level.INFO, "[EzFramework] register TabComplete method : /{0}, method: {1}", new Object[]{key, method});
         }
     }
 
@@ -170,6 +183,16 @@ public class AnnotationHandlerMapping implements HandlerMapping, BeanFactoryAwar
         }
         return new DefaultInvocableHandlerMethod();
     }
+    
+    /*@Override
+    public InvocableHandlerMethod getTabCompleteHandler(String command) {
+        for (String key : tabcompleteHandlers.keySet()) {
+            if(command.contains(key)) {
+                return tabcompleteHandlers.get(key);
+            }
+        }
+        return new DefaultInvocableHandlerMethod();
+    }*/
 
     @Override
     public Set<HandlerKey> getHandlerKeys() {
